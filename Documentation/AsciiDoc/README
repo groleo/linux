@@ -1,0 +1,17 @@
+This archive contains the following scripts:
+	asciidoc-convertor -> used to extract the comments from a .c file
+			  the asciidoc-convertor script is a modified version of the kernel-doc script and it is used the same way,
+			  the output is different , coresponding to the asciidoc format for manpages and pdf.
+	
+	function-extractor -> used to extrat all the names of the functions/struct/typedef/enum form the input file/files
+
+	run_asciidoc -> is the script that combines the first two and creates the manpage or pdf according to the input file/files or options "-man / -pdf"
+			it  calls asciidoc-convertor with the function parameter and then concatenates the result into a manpage
+			named by the user.
+			The result from running "run_asciidoc" are all the individual manpage for all the structured comments in the files
+			and the combined version of the manpage.
+			Also running the script will produce ".doc " files that are the product
+			of running asciidoc-convertor, these files are deleted but can be used to 
+			add or modify the content of the manpage. The format is easily understandable.
+			
+
