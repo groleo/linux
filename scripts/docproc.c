@@ -68,6 +68,7 @@ FILELINE * docsection;
 #define KERNELDOCPATH "scripts/"
 #define KERNELDOC     "kernel-doc"
 #define DOCBOOK       "-docbook"
+#define ASCIIDOC      "-asciidoc"
 #define LIST          "-list"
 #define FUNCTION      "-function"
 #define NOFUNCTION    "-nofunction"
@@ -78,6 +79,8 @@ static char *srctree, *kernsrctree;
 
 static char **all_list = NULL;
 static int all_list_len = 0;
+
+static char *docgen = DOCBOOK;
 
 static void consume_symbol(const char *sym)
 {
@@ -95,7 +98,7 @@ static void consume_symbol(const char *sym)
 
 static void usage (void)
 {
-	fprintf(stderr, "Usage: docproc {doc|depend} file\n");
+	fprintf(stderr, "Usage: docproc {doc|depend} file [use_asciidoc]\n");
 	fprintf(stderr, "Input is read from file.tmpl. Output is sent to stdout\n");
 	fprintf(stderr, "doc: frontend when generating kernel documentation\n");
 	fprintf(stderr, "depend: generate list of files referenced within file\n");
@@ -263,7 +266,7 @@ static void docfunctions(char * filename, char * type)
 		exit(1);
 	}
 	vec[idx++] = KERNELDOC;
-	vec[idx++] = DOCBOOK;
+	vec[idx++] = docgen;
 	vec[idx++] = NODOCSECTIONS;
 	for (i=0; i < symfilecnt; i++) {
 		struct symfile * sym = &symfilelist[i];
@@ -294,7 +297,7 @@ static void singfunc(char * filename, char * line)
 	int i, idx = 0;
 	int startofsym = 1;
 	vec[idx++] = KERNELDOC;
-	vec[idx++] = DOCBOOK;
+	vec[idx++] = docgen;
 	vec[idx++] = SHOWNOTFOUND;
 
 	/* Split line up in individual parameters preceded by FUNCTION */
@@ -343,7 +346,7 @@ static void docsect(char *filename, char *line)
 	free(s);
 
 	vec[0] = KERNELDOC;
-	vec[1] = DOCBOOK;
+	vec[1] = docgen;
 	vec[2] = SHOWNOTFOUND;
 	vec[3] = FUNCTION;
 	vec[4] = line;
@@ -509,9 +512,12 @@ int main(int argc, char *argv[])
 	kernsrctree = getenv("KBUILD_SRC");
 	if (!kernsrctree || !*kernsrctree)
 		kernsrctree = srctree;
-	if (argc != 3) {
+	if (argc < 3) {
 		usage();
 		exit(1);
+	}
+	if (argc == 4) {
+		docgen = ASCIIDOC;
 	}
 	/* Open file, exit on error */
 	infile = fopen(argv[2], "r");
