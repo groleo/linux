@@ -6,12 +6,19 @@
 # To add a new book the only step required is to add the book to the
 # list of ASCIIDOCS.
 
-ASCIIDOCS := z8530book.tmpl article.txt drivers.9.txt
-GENDIR:=AsciiDoc
-srctree?=../..
-obj?=.
+ASCIIDOCS := z8530book.asciidoc device-drivers.asciidoc \
+	     kernel-hacking.asciidoc kernel-locking.asciidoc deviceiobook.asciidoc \
+	     writing_usb_driver.asciidoc networking.asciidoc \
+	     kernel-api.asciidoc filesystems.asciidoc lsm.asciidoc usb.asciidoc kgdb.asciidoc \
+	     gadget.asciidoc libata.asciidoc mtdnand.asciidoc librs.asciidoc rapidio.asciidoc \
+	     genericirq.asciidoc s390-drivers.asciidoc uio-howto.asciidoc scsi.asciidoc \
+	     80211.asciidoc debugobjects.asciidoc sh.asciidoc regulator.asciidoc \
+	     alsa-driver-api.asciidoc writing-an-alsa-driver.asciidoc \
+	     tracepoint.asciidoc drm.asciidoc media_api.asciidoc w1.asciidoc \
+	     writing_musb_glue_layer.asciidoc
 
--include $(srctree)/Documentation/$(GENDIR)/media/Makefile
+
+-include $(srctree)/Documentation/DocBook/media/Makefile
 
 ###
 # The build process is as follows (targets):
@@ -23,29 +30,45 @@ obj?=.
 
 
 # for PDF and PS output you can choose between xmlto and docbook-utils tools
-PDF_METHOD	= $(prefer-db2x)
+PDF_METHOD	= $(prefer-a2x)
 PS_METHOD	= $(prefer-db2x)
 
-
-###
+BEXT:=asciidoc
+##
 # The targets that may be used.
-PHONY += xmldocs sgmldocs psdocs pdfdocs htmldocs mandocs installmandocs cleandocs LaTeX docbook dvi chunked epub
+PHONY += xmldocs sgmldocs psdocs pdfdocs htmldocs mandocs installmandocs cleandocs
 
-BOOKS := $(addsuffix .txt,$(addprefix $(obj)/,$(ASCIIDOCS)))
+targets += $(ASCIIDOCS)
+BOOKS := $(addprefix $(obj)/,$(ASCIIDOCS))
 xmldocs: $(BOOKS)
 sgmldocs: xmldocs
 
+PS := $(patsubst %.$(BEXT), %.ps, $(BOOKS))
+psdocs: $(PS)
+
+PDF := $(patsubst %.$(BEXT), %.pdf, $(BOOKS))
+pdfdocs: $(PDF)
+
+HTML := $(sort $(patsubst %.$(BEXT), %.html, $(BOOKS)))
+htmldocs: $(HTML)
+	$(call build_main_index)
+	$(call build_images)
+	$(call install_media_images)
+
+MAN := $(patsubst %.$(BEXT), %.9, $(BOOKS))
+mandocs: $(MAN)
+	$(if $(wildcard $(obj)/man/*.9),gzip -f $(obj)/man/*.9)
+
 installmandocs: mandocs
 	mkdir -p /usr/local/man/man9/
-	install Documentation/$(GENDIR)/man/*.9.gz /usr/local/man/man9/
+	install $(obj)/man/*.9.gz /usr/local/man/man9/
 
 ###
 #External programs used
 KERNELDOC = $(srctree)/scripts/kernel-doc
-
 DOCPROC   = $(objtree)/scripts/docproc
 
-XMLTOFLAGS = -m $(srctree)/Documentation/$(GENDIR)/stylesheet.xsl
+XMLTOFLAGS = -m $(srctree)/$(src)/stylesheet.xsl
 XMLTOFLAGS += --skip-validation
 
 ###
@@ -53,10 +76,10 @@ XMLTOFLAGS += --skip-validation
 # 1) To generate a dependency list for a .tmpl file
 # 2) To preprocess a .tmpl file and call kernel-doc with
 #     appropriate parameters.
-# The following rules are used to generate the .txt documentation
+# The following rules are used to generate the .$(BEXT) documentation
 # required to generate the final targets. (ps, pdf, html).
 quiet_cmd_docproc = DOCPROC $@
-      cmd_docproc = SRCTREE=$(srctree)/ $(DOCPROC) doc $< >$@
+      cmd_docproc = SRCTREE=$(srctree)/ $(DOCPROC) doc $< ad >$@
 define rule_docproc
 	set -e;								\
         $(if $($(quiet)cmd_$(1)),echo '  $($(quiet)cmd_$(1))';) 	\
@@ -67,144 +90,85 @@ define rule_docproc
         ) > $(dir $@).$(notdir $@).cmd
 endef
 
-%.txt: %.tmpl FORCE
+%.$(BEXT): %.tmpl $(KERNELDOC) $(DOCPROC) FORCE
 	$(call if_changed_rule,docproc)
-
-ifneq ($(cmd_files),)
-  include $(cmd_files)
-endif
-
-###
-# Changes in kernel-doc force a rebuild of all documentation
-$(BOOKS): $(KERNELDOC)
 
 # Tell kbuild to always build the programs
 always := $(hostprogs-y)
 
 notfoundtemplate = echo "*** You have to install docbook-utils or xmlto ***"; \
 		   exit 1
+db2xtemplate = db2TYPE -o $(dir $@) $<
+a2xtemplate  = a2x --no-xmllint -a docinfo --doctype=book --format=TYPE $<
+xmltotemplate = xmlto TYPE $(XMLTOFLAGS) -o $(dir $@) $<
+
+# determine which methods are available
+ifeq ($(shell which db2ps >/dev/null 2>&1 && echo found),found)
+	use-db2x = db2x
+	prefer-db2x = db2x
+else
+	use-db2x = notfound
+	prefer-db2x = $(use-xmlto)
+endif
+ifeq ($(shell which xmlto >/dev/null 2>&1 && echo found),found)
+	use-xmlto = xmlto
+	prefer-xmlto = xmlto
+else
+	use-xmlto = notfound
+	prefer-xmlto = $(use-db2x)
+endif
+ifeq ($(shell which a2x >/dev/null 2>&1 && echo found),found)
+	use-a2x = a2x
+	prefer-a2x = a2x
+else
+	use-a2x = notfound
+	prefer-a2x = notfound
+endif
+
+# the commands, generated from the chosen template
+quiet_cmd_db2ps = PS      $@
+      cmd_db2ps = $(subst TYPE,ps, $($(PS_METHOD)template))
+%.ps : %.$(BEXT)
+	$(call cmd,db2ps)
+
+quiet_cmd_a2pdf = PDF     $@
+      cmd_a2pdf = $(subst TYPE,pdf, $($(PDF_METHOD)template))
+      cmdd_a2pdf = a2x --doctype=book --format=pdf $$file;
+%.pdf : %.$(BEXT)
+	$(call cmd,a2pdf)
+
+
+index = index.html
+main_idx = $(obj)/$(index)
+build_main_index = rm -rf $(main_idx); \
+		   echo '<h1>Linux Kernel HTML Documentation</h1>' >> $(main_idx) && \
+		   echo '<h2>Kernel Version: $(KERNELVERSION)</h2>' >> $(main_idx) && \
+		   cat $(HTML) >> $(main_idx)
 
 quiet_cmd_db2html = HTML    $@
-      cmd_db2html = xmlto xhtml $(XMLTOFLAGS) -o $(patsubst %.html,%,$@) $< && \
+      cmd_db2html = xmlto html $(XMLTOFLAGS) -o $(patsubst %.html,%,$@) $< && \
 		echo '<a HREF="$(patsubst %.html,%,$(notdir $@))/index.html"> \
-        $(patsubst %.html,%,$(notdir $@))</a><p>' > $@
+		$(patsubst %.html,%,$(notdir $@))</a><p>' > $@
 
-quiet_cmd_a2man = MAN     $@
-      cmd_a2man = a2x --doctype=manpage --format=manpage $(obj)/*.9; gzip -f $(obj)/man/*.9
-
-mandocs :
-	@(which a2x > /dev/null 2>&1) || \
-	 (echo "*** You need to install a2x ***"; \
+%.html:	%.$(BEXT)
+	@(which xmlto > /dev/null 2>&1) || \
+	 (echo "*** You need to install xmlto ***"; \
 	  exit 1)
-	for file in $(ASCIIDOCS); do \
-		a2x --doctype=manpage --format=manpage $$file; \
-	done	 		
+	@rm -rf $@ $(patsubst %.html,%,$@)
+	$(call cmd,db2html)
+	@if [ ! -z "$(PNG-$(basename $(notdir $@)))" ]; then \
+            cp $(PNG-$(basename $(notdir $@))) $(patsubst %.html,%,$@); fi
+
+quiet_cmd_db2man = MAN     $@
+      cmd_db2man = if grep -q refentry $<; then xmlto man $(XMLTOFLAGS) -o $(obj)/man $< ; fi
+%.9 : %.$(BEXT)
+	@(which xmlto > /dev/null 2>&1) || \
+	 (echo "*** You need to install xmlto ***"; \
+	  exit 1)
+	$(Q)mkdir -p $(obj)/man
+	$(call cmd,db2man)
 	@touch $@
 
-#article format (PDF)
-quiet_cmd_a2art = PDF     $@
-	cmd_a2art = a2x --doctype=article --format=pdf $(ASCIIDOCS); gzip -f $(obj)/pdfdocs/*.pdf
-
-pdfdocs :
-	@(which a2x > /dev/null 2>&1) || \
-	 (echo "*** You need to install a2x ***"; \
-	  exit 1)
-	for file in $(ASCIIDOCS); do \
-		a2x --doctype=article --format=pdf $$file; \
-	done
-	@touch $@
-
-#article format (PS)
-quiet_cmd_a2psdoc = PS     $@
-	cmd_a2art = a2x --doctype=article --format=ps $(ASCIIDOCS); gzip -f $(obj)/psdocs/*.pdf
-
-psdocs :
-	@(which a2x > /dev/null 2>&1) || \
-	 (echo "*** You need to install a2x ***"; \
-	  exit 1)
-	for file in $(ASCIIDOCS); do \
-		a2x --doctype=article --format=ps $$file; \
-	done
-	@touch $@
-
-#html format
-quiet_cmd_a2html = HTML     $@
-	cmd_a2html = a2x --doctype=article --format=xhtml $(ASCIIDOCS); gzip -f $(obj)/html/*.html
-
-htmldocs :
-	@(which a2x > /dev/null 2>&1) || \
-	 (echo "*** You need to install a2x ***"; \
-	  exit 1)
-	for file in $(ASCIIDOCS); do \
-		a2x --doctype=article --format=xhtml $$file; \
-	done
-	@touch $@
-
-#latex format
-quiet_cmd_a2tex = TEX     $@
-	cmd_a2tex = a2x --doctype=article --format=tex $(ASCIIDOCS); gzip -f $(obj)/tex/*.tex
-
-LaTeX : 
-	@(which a2x > /dev/null 2>&1) || \
-	 (echo "*** You need to install a2x ***"; \
-	  exit 1)
-	for file in $(ASCIIDOCS); do \
-		a2x --doctype=article --format=tex $$file; \
-	done
-	@touch $@
-
-#docbook format 
-quiet_cmd_a2docbook = TEX     $@
-	cmd_a2docbook = a2x --doctype=article --format=docbook $(ASCIIDOCS); gzip -f $(obj)/xml/*.xml
-	
-docbook : 
-	@(which a2x > /dev/null 2>&1) || \
-	 (echo "*** You need to install a2x ***"; \
-	  exit 1)
-	for file in $(ASCIIDOCS); do \
-		a2x --doctype=article --format=docbook $$file; \
-	done
-	@touch $@
-
-#dvi format
-quiet_cmd_a2docbook = DVI     $@
-	cmd_a2docbook = a2x --doctype=article --format=dvi $(ASCIIDOCS); gzip -f $(obj)/dvi/*.dvi
-	
-dvi : 
-	@(which a2x > /dev/null 2>&1) || \
-	 (echo "*** You need to install a2x ***"; \
-	  exit 1)
-	for file in $(ASCIIDOCS); do \
-		a2x --doctype=article --format=dvi $$file; \
-	done
-	@touch $@
-
-#chunked format
-quiet_cmd_a2chunked = CHUNK     $@
-	cmd_a2chunked  = a2x --doctype=article --format=chunked $(ASCIIDOCS);
-
-
-chunked : 
-	@(which a2x > /dev/null 2>&1) || \
-	 (echo "*** You need to install a2x ***"; \
-	  exit 1)
-	for file in $(ASCIIDOCS); do \
-		a2x --doctype=article --format=chunked $$file; \
-	done
-	@touch $@
-
-#epub format
-quiet_cmd_a2epub = EPUB     $@
-	cmd_a2epub = a2x --doctype=article --format=epub $(ASCIIDOCS)
-
-epub : 	
-	@(which a2x > /dev/null 2>&1) || \
-	 (echo "*** You need to install a2x ***"; \
-	  exit 1)
-	for file in $(ASCIIDOCS); do \
-		a2x --doctype=article --format=epub $$file; \
-	done 
-	@touch $@
 ###
 # Rules to generate postscripts and PNG images from .fig format files
 quiet_cmd_fig2eps = FIG2EPS $@
@@ -227,7 +191,7 @@ quiet_cmd_fig2png = FIG2PNG $@
 
 ###
 # Rule to convert a .c file to inline XML documentation
-       gen_xml = : 
+       gen_xml = :
  quiet_gen_xml = echo '  GEN     $@'
 silent_gen_xml = :
 %.txt: %.c
@@ -243,43 +207,36 @@ silent_gen_xml = :
 ###
 # Help targets as used by the top-level makefile
 dochelp:
-	@echo  '  Linux kernel internal documentation in different formats:'
+	@echo  ' Linux kernel internal documentation in different formats:'
 	@echo  '  htmldocs        - HTML'
-	@echo  '  LaTeX		  - TEX'
 	@echo  '  pdfdocs         - PDF'
 	@echo  '  psdocs          - Postscript'
-	@echo  '  xmldocs         - XML asciidoc'
+	@echo  '  xmldocs         - XML DocBook'
 	@echo  '  mandocs         - man pages'
 	@echo  '  installmandocs  - install man pages generated by mandocs'
-	@echo  '  docbook         - xml'
-	@echo  '  chunked         - CHUNKED'
-	@echo  '  epub 		  - EPUB'	
-	@echo  '  cleandocs       - clean all generated asciidoc files'
+	@echo  '  cleandocs       - clean all generated DocBook files'
 
 ###
 # Temporary files left by various tools
-clean-files := $(ASCIIDOCS) \
-	$(patsubst %.txt, %.dvi,  $(ASCIIDOCS)) \
-	$(patsubst %.txt, %.aux,  $(ASCIIDOCS)) \
-	$(patsubst %.txt, %.tex,  $(ASCIIDOCS)) \
-	$(patsubst %.txt, %.log,  $(ASCIIDOCS)) \
-	$(patsubst %.txt, %.out,  $(ASCIIDOCS)) \
-	$(patsubst %.txt, %.ps,   $(ASCIIDOCS)) \
-	$(patsubst %.txt, %.pdf,  $(ASCIIDOCS)) \
-	$(patsubst %.txt, %.html, $(ASCIIDOCS)) \
-	$(patsubst %.txt, %.9,    $(ASCIIDOCS)) \
-	$(patsubst %.txt, %.xml,  $(ASCIIDOCS)) \
+clean-files := $(DOCBOOKS) \
+	$(patsubst %.$(BEXT), %.dvi,  $(DOCBOOKS)) \
+	$(patsubst %.$(BEXT), %.aux,  $(DOCBOOKS)) \
+	$(patsubst %.$(BEXT), %.tex,  $(DOCBOOKS)) \
+	$(patsubst %.$(BEXT), %.log,  $(DOCBOOKS)) \
+	$(patsubst %.$(BEXT), %.out,  $(DOCBOOKS)) \
+	$(patsubst %.$(BEXT), %.ps,   $(DOCBOOKS)) \
+	$(patsubst %.$(BEXT), %.pdf,  $(DOCBOOKS)) \
+	$(patsubst %.$(BEXT), %.html, $(DOCBOOKS)) \
+	$(patsubst %.$(BEXT), %.9,    $(DOCBOOKS)) \
 	$(index)
 
-clean-dirs := $(patsubst %.txt,%,$(ASCIIDOCS)) man
+clean-dirs := $(patsubst %.$(BEXT),%,$(DOCBOOKS)) man
 
-cleandocs:
-	mkdir $(srctree)/asciidoc_aux
-	mv $(ASCIIDOCS) media Makefile $(srctree)/asciidoc_aux
-	rm -rf * 
-	mv $(srctree)/asciidoc_aux/* $(obj)
-	rm -rf $(srctree)/asciidoc_aux
+cleandocs: cleanmediadocs
+	$(Q)rm -f $(call objectify, $(clean-files))
+	$(Q)rm -rf $(call objectify, $(clean-dirs))
 
 # Declare the contents of the .PHONY variable as phony.  We keep that
 # information in a variable se we can use it in if_changed and friends.
+
 .PHONY: $(PHONY)
