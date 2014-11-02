@@ -1,0 +1,89 @@
+
+
+++++++++++++++++++++++++++++++++++++++
+<!-- ****************************************************** -->
+++++++++++++++++++++++++++++++++++++++
+    
+
+
+++++++++++++++++++++++++++++++++++++++
+<!-- Header  -->
+++++++++++++++++++++++++++++++++++++++
+    
+
+
+++++++++++++++++++++++++++++++++++++++
+<!-- ****************************************************** -->
+++++++++++++++++++++++++++++++++++++++
+    
+= The ALSA Driver API
+
+
+== Management of Cards and Devices
+
+
+=== Card Management
+
+
+=== Device Components
+
+
+=== Module requests and Device File Entries
+
+
+=== Memory Management Helpers
+
+
+== PCM API
+
+
+=== PCM Core
+
+
+=== PCM Format Helpers
+
+
+=== PCM Memory Management
+
+
+== Control/Mixer API
+
+
+=== General Control Interface
+
+
+=== AC97 Codec API
+
+
+=== Virtual Master Control API
+
+
+== MIDI API
+
+
+=== Raw MIDI API
+
+
+=== MPU401-UART API
+
+
+== Proc Info API
+
+
+=== Proc Info Interface
+
+
+== Miscellaneous Functions
+
+
+=== Hardware-Dependent Devices API
+
+
+=== Jack Abstraction Layer API
+
+
+=== ISA DMA Helpers
+
+
+=== Other Helper Macros
+

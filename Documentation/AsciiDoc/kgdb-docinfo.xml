@@ -1,0 +1,7 @@
+<title>Using kgdb, kdb and the kernel debugger internals</title><authorgroup><author><firstname>Jason</firstname><surname>Wessel</surname><affiliation><address format="linespecific">
+      <email>jason.wessel@windriver.com</email>
+     </address></affiliation></author></authorgroup><copyright><year>2008,2010</year><holder>Wind River Systems, Inc.</holder></copyright><copyright><year>2004-2005</year><holder>MontaVista Software, Inc.</holder></copyright><copyright><year>2004</year><holder>Amit S. Kale</holder></copyright><legalnotice><para>
+   This file is licensed under the terms of the GNU General Public License
+   version 2. This program is licensed "as is" without any warranty of any
+   kind, whether express or implied.
+   </para></legalnotice>

@@ -1,0 +1,214 @@
+= The Linux Kernel API
+
+[[adt]]
+
+== Data Types
+
+
+=== Doubly Linked Lists
+
+[[libc]]
+
+== Basic C Library Functions
+
+
+       When writing drivers, you cannot in general use routines which are
+       from the C Library.  Some of the functions have been found generally
+       useful and they are listed below.  The behaviour of these functions
+       may vary slightly from those defined by ANSI, and these deviations
+       are noted in the text.
+     
+
+
+=== String Conversions
+
+
+=== String Manipulation
+
+
+=== Bit Operations
+
+[[kernel-lib]]
+
+== Basic Kernel Library Functions
+
+
+       The Linux kernel provides more basic utility functions.
+     
+
+
+=== Bitmap Operations
+
+
+=== Command-line Parsing
+
+[[crc]]
+
+=== CRC Functions
+
+[[idr]]
+
+=== idr/ida Functions
+
+[[mm]]
+
+== Memory Management in Linux
+
+
+=== The Slab Cache
+
+
+=== User Space Memory Access
+
+
+=== More Memory Management Functions
+
+[[ipc]]
+
+== Kernel IPC facilities
+
+
+=== IPC utilities
+
+[[kfifo]]
+
+== FIFO Buffer
+
+
+=== kfifo interface
+
+[[relayfs]]
+
+== relay interface support
+
+
+	Relay interface support
+	is designed to provide an efficient mechanism for tools and
+	facilities to relay large amounts of data from kernel space to
+	user space.
+     
+
+
+=== relay interface
+
+[[modload]]
+
+== Module Support
+
+
+=== Module Loading
+
+
+=== Inter Module support
+
+
+           Refer to the file kernel/module.c for more information.
+        
+
+[[hardware]]
+
+== Hardware Interfaces
+
+
+=== Interrupt Handling
+
+
+=== DMA Channels
+
+
+=== Resources Management
+
+
+=== MTRR Handling
+
+
+=== PCI Support Library
+
+
+=== PCI Hotplug Support Library
+
+[[firmware]]
+
+== Firmware Interfaces
+
+
+=== DMI Interfaces
+
+
+=== EDD Interfaces
+
+[[security]]
+
+== Security Framework
+
+[[audit]]
+
+== Audit Interfaces
+
+[[accounting]]
+
+== Accounting Framework
+
+[[blkdev]]
+
+== Block Devices
+
+[[chrdev]]
+
+== Char devices
+
+[[miscdev]]
+
+== Miscellaneous Devices
+
+[[clk]]
+
+== Clock Framework
+
+
+	The clock framework defines programming interfaces to support
+	software management of the system clock tree.
+	This framework is widely used with System-On-Chip (SOC) platforms
+	to support power management and various devices which may need
+	custom clock rates.
+	Note that these "clocks" don't relate to timekeeping or real
+	time clocks (RTCs), each of which have separate frameworks.
+	These struct clk instances may be used
+	to manage for example a 96 MHz signal that is used to shift bits
+	into and out of peripherals or busses, or otherwise trigger
+	synchronous state machine transitions in system hardware.
+     
+
+
+	Power management is supported by explicit software clock gating:
+	unused clocks are disabled, so the system doesn't waste power
+	changing the state of transistors that aren't in active use.
+	On some systems this may be backed by hardware clock gating,
+	where clocks are gated without being disabled in software.
+	Sections of chips that are powered but not clocked may be able
+	to retain their last state.
+	This low power state is often called a _retention mode_.
+	This mode still incurs leakage currents, especially with finer
+	circuit geometries, but for CMOS circuits power is mostly used
+	by clocked state changes.
+     
+
+
+	Power-aware drivers only enable their clocks when the device
+	they manage is in active use.  Also, system sleep states often
+	differ according to which clock domains are active:  while a
+	"standby" state may allow wakeup from several active domains, a
+	"mem" (suspend-to-RAM) state may require a more wholesale shutdown
+	of clocks derived from higher speed PLLs and oscillators, limiting
+	the number of possible wakeup event sources.  A driver's suspend
+	method may need to be aware of system-specific clock constraints
+	on the target sleep state.
+     
+
+
+        Some platforms support programmable clock generators.  These
+	can be used by external chips of various kinds, such as other
+	CPUs, multimedia codecs, and devices with strict requirements
+	for interface clocking.
+     
+

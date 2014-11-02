@@ -1,0 +1,15 @@
+<title>W1: Dallas' 1-wire bus</title><authorgroup><author><firstname>David</firstname><surname>Fries</surname><affiliation><address format="linespecific">
+            <email>David@Fries.net</email>
+          </address></affiliation></author></authorgroup><copyright><year>2013</year><!--
+      <holder></holder>
+      --></copyright><legalnotice><para>
+        This documentation is free software; you can redistribute
+        it and/or modify it under the terms of the GNU General Public
+        License version 2.
+      </para><para>
+        This program is distributed in the hope that it will be
+        useful, but WITHOUT ANY WARRANTY; without even the implied
+        warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+        For more details see the file COPYING in the source
+        distribution of Linux.
+      </para></legalnotice>

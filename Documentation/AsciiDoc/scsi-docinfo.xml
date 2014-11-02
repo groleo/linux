@@ -1,0 +1,15 @@
+<title>SCSI Interfaces Guide</title><authorgroup><author><firstname>James</firstname><surname>Bottomley</surname><affiliation><address format="linespecific">
+            <email>James.Bottomley@hansenpartnership.com</email>
+          </address></affiliation></author><author><firstname>Rob</firstname><surname>Landley</surname><affiliation><address format="linespecific">
+            <email>rob@landley.net</email>
+          </address></affiliation></author></authorgroup><copyright><year>2007</year><holder>Linux Foundation</holder></copyright><legalnotice><para>
+        This documentation is free software; you can redistribute
+        it and/or modify it under the terms of the GNU General Public
+        License version 2.
+      </para><para>
+        This program is distributed in the hope that it will be
+        useful, but WITHOUT ANY WARRANTY; without even the implied
+        warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+        For more details see the file COPYING in the source
+        distribution of Linux.
+      </para></legalnotice>

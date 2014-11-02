@@ -1,0 +1,20 @@
+<title>Debug objects life time</title><authorgroup><author><firstname>Thomas</firstname><surname>Gleixner</surname><affiliation><address format="linespecific">
+      <email>tglx@linutronix.de</email>
+     </address></affiliation></author></authorgroup><copyright><year>2008</year><holder>Thomas Gleixner</holder></copyright><legalnotice><para>
+     This documentation is free software; you can redistribute
+     it and/or modify it under the terms of the GNU General Public
+     License version 2 as published by the Free Software Foundation.
+   </para><para>
+     This program is distributed in the hope that it will be
+     useful, but WITHOUT ANY WARRANTY; without even the implied
+     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+     See the GNU General Public License for more details.
+   </para><para>
+     You should have received a copy of the GNU General Public
+     License along with this program; if not, write to the Free
+     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+     MA 02111-1307 USA
+   </para><para>
+     For more details see the file COPYING in the source
+     distribution of Linux.
+   </para></legalnotice>

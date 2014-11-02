@@ -1,0 +1,12 @@
+<title>Linux DRM Developer's Guide</title><authorgroup><author><firstname>Jesse</firstname><surname>Barnes</surname><contrib>Initial version</contrib><affiliation><orgname>Intel Corporation</orgname><address format="linespecific">
+	    <email>jesse.barnes@intel.com</email>
+	  </address></affiliation></author><author><firstname>Laurent</firstname><surname>Pinchart</surname><contrib>Driver internals</contrib><affiliation><orgname>Ideas on board SPRL</orgname><address format="linespecific">
+	    <email>laurent.pinchart@ideasonboard.com</email>
+	  </address></affiliation></author><author><firstname>Daniel</firstname><surname>Vetter</surname><contrib>Contributions all over the place</contrib><affiliation><orgname>Intel Corporation</orgname><address format="linespecific">
+	    <email>daniel.vetter@ffwll.ch</email>
+	  </address></affiliation></author></authorgroup><copyright><year>2008-2009</year><year>2013-2014</year><holder>Intel Corporation</holder></copyright><copyright><year>2012</year><holder>Laurent Pinchart</holder></copyright><legalnotice><para>
+	The contents of this file may be used under the terms of the GNU
+	General Public License version 2 (the "GPL") as distributed in
+	the kernel source COPYING file.
+      </para></legalnotice><revhistory><!-- Put document revisions here, newest first. --><revision><revnumber>1.0</revnumber><date>2012-07-13</date><authorinitials>LP</authorinitials><revremark>Added extensive documentation about driver internals.
+	</revremark></revision></revhistory>

@@ -1,0 +1,25 @@
+<title>Writing USB Device Drivers</title><authorgroup><author><firstname>Greg</firstname><surname>Kroah-Hartman</surname><affiliation><address format="linespecific">
+      <email>greg@kroah.com</email>
+     </address></affiliation></author></authorgroup><copyright><year>2001-2002</year><holder>Greg Kroah-Hartman</holder></copyright><legalnotice><para>
+     This documentation is free software; you can redistribute
+     it and/or modify it under the terms of the GNU General Public
+     License as published by the Free Software Foundation; either
+     version 2 of the License, or (at your option) any later
+     version.
+   </para><para>
+     This program is distributed in the hope that it will be
+     useful, but WITHOUT ANY WARRANTY; without even the implied
+     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+     See the GNU General Public License for more details.
+   </para><para>
+     You should have received a copy of the GNU General Public
+     License along with this program; if not, write to the Free
+     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+     MA 02111-1307 USA
+   </para><para>
+     For more details see the file COPYING in the source
+     distribution of Linux.
+   </para><para>
+     This documentation is based on an article published in 
+     Linux Journal Magazine, October 2001, Issue 90.
+   </para></legalnotice>
